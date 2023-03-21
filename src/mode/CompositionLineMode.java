@@ -1,0 +1,47 @@
+package mode;
+
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+
+import shape.CompositionLine;
+import shape.LineObject;
+import shape.Port;
+import shape.Shape;
+
+public class CompositionLineMode extends Mode{
+	private Port startPort=null;
+	private Port endPort=null;
+	private ArrayList<Shape> shapes;
+	private Shape pressShape = null;
+	
+	public void mousePressed(MouseEvent e) {
+		shapes = canvas.getAllShapes();
+		for(Shape shape:shapes) {
+			if(shape.checkInsideShape(e.getPoint())) {
+				startPort = shape.getConnectPort(e.getPoint());
+				pressShape = shape;
+				break;
+			}
+		}
+	}
+	public void mouseReleased(MouseEvent e) {
+		if (startPort != null) {	
+			for(Shape shape:shapes) {
+				if(shape.checkInsideShape(e.getPoint())) {
+					if(shape == pressShape) {continue;}
+					endPort = shape.getConnectPort(e.getPoint());
+					break;
+				}
+			}
+
+			if (endPort != null) {
+				LineObject line = new CompositionLine(startPort, endPort);
+				canvas.addShape(line);
+			}
+	
+			canvas.repaint();
+			startPort = null;
+			endPort = null;
+		}
+	}	
+}
